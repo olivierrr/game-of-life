@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>game_of_life</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -32,7 +33,7 @@
             <div>
                 <input id='maxVelocitySLDR' type="range" min='0' max='30' step='1'>
                 <br>
-                <div class='small'>from 0 to this value (reset to apply)</div>
+                <div class='small'>speed = from 0 to this value (reset to apply)</div>
             </div>
             <br>
             <div>
@@ -53,43 +54,6 @@
         </div>
     </div>
     <canvas id='game'></canvas>
-    <style>
-    * {
-        margin:0;
-        padding:0;
-        text-align: center;
-    }
-    a {
-    	color:white;
-    }
-    input{
-    	width: 80%;
-    }
-    input[type='text']{
-    	width: 20px;
-    }
-    #ui {
-        border: 1px solid white;
-        color:white;
-        position: absolute;
-        opacity: 0.2;
-        left: 10px;
-        top: 10px;
-        padding: 3px;
-    }
-    #ui:hover {
-        opacity: 0.8;
-    }
-    #ui2 {
-        padding: 2px;
-  
-        display: block;
-    }
-    .small {
-        font-size: 12px;
-        //border-bottom: 1px solid #3E3E3E;
-    }
-    </style>
     <script type="text/javascript" src="main.js"></script>
 </body>
 

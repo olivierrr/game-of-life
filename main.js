@@ -99,6 +99,7 @@ Particle.prototype.draw = function(){
 }
 
 function update() {
+    //check rules
     rules();
     ctx.fillStyle = 'black';
     ctx.fillRect(0,0,W,H);

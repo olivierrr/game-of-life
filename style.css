@@ -1,0 +1,34 @@
+* {
+    margin:0;
+    padding:0;
+    text-align: center;
+}
+a {
+    color:white;
+}
+input {
+    width: 80%;
+}
+input[type='text'] {
+    width: 20px;
+}
+#ui {
+    border: 1px solid white;
+    color:white;
+    position: absolute;
+    opacity: 0.2;
+    left: 10px;
+    top: 10px;
+    padding: 3px;
+}
+#ui:hover {
+    opacity: 0.8;
+}
+#ui2 {
+    padding: 2px;
+    display: block;
+}
+.small {
+    font-size: 12px;
+    //border-bottom: 1px solid #3E3E3E;
+}
