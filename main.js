@@ -24,7 +24,7 @@ var startingParticleCount = 500,
     showAge = 1;
 
 //rules //TODO: fix
-var rule3 = 5,
+var rule3 = 6,
     rule2 = 3,
     rule22 = 4,
     rule1 = 0;
@@ -64,12 +64,11 @@ function constructParticle(posX, posY, vx, vy) {
 //Particle
 var Particle = function(posX, posY, vvx, vvy) {
 
-    this.self = this;
     this.x = posX;
     this.y = posY;
     this.vx = vvx;
     this.vy = vvy;
-    this.neighbors = -1;
+    this.neighbors = 0;
     this.age = 0;
 }
 
@@ -103,8 +102,8 @@ Particle.prototype.update = function(){
     var i = particles.length;
     while(i--){
         var p2 = particles[i];
-        if(p2 === this.self) break;
-        getVector(this.self, p2);
+        if(p2 === this) break;
+        getVector(this, p2);
     }
 }
 
@@ -153,14 +152,14 @@ function getVector(p1, p2) {
 }
 
 //checks game rules
-function rules(){
+function checkRules(){
 
     //iterrate Particle instances
     var i = particles.length;
     while(i--){
         var p1 = particles[i];
-        if( p1.neighbors === rule1 ) p1.kill();
-        if( p1.neighbors > rule3 ) p1.kill();
+        if( p1.neighbors <= rule1 ) p1.kill();
+        if( p1.neighbors >= rule3 ) p1.kill();
         if( p1.neighbors === rule2 || p1.neighbors === rule22) constructParticle(
             p1.x + rand(minDist/expandDivider), p1.y + rand(minDist/expandDivider), p1.vx, p1.vy
         );
@@ -168,9 +167,6 @@ function rules(){
 }
 
 function update() {
-
-    //check rules
-    rules();
 
     //clear canvas
     ctx.fillStyle = 'black';
@@ -182,6 +178,9 @@ function update() {
         particles[i].update();
         if(showAge === 1)particles[i].draw();
     }
+
+    //check rules
+    checkRules();
 }
 
 //game loop
@@ -235,55 +234,74 @@ canvas.onmousedown = function(e) {
     document.onmouseup = function() { canvas.onmousemove = null; }
 }
 
+//get DOM element by id
+function getElement(id){
+    return document.getElementById(id);
+}
+
+function bind(elem, listener, model, callback){
+    var elem = document.getElementById(elem);
+    elem.value = model;
+    elem[listener] = function(){
+        callback(elem);
+    }
+}
+
 //UI
 window.onload = function(){
-
-    //get buttons
-    var pauseBTN = document.getElementById('pauseBTN'),
-        resumeBTN = document.getElementById('resumeBTN'),
-        resetBTN = document.getElementById('resetBTN'),
-        minimizeBTN = document.getElementById('minimizeBTN');
 
     var helpBTN_state = 0,
         minimizeBTN_state = 0;
 
-    pauseBTN.onclick=function() {gameRunning = false;}
-    resumeBTN.onclick=function() {gameRunning = true;}
-    oneframeBTN.onclick=function() {update()}
-    resetBTN.onclick=function() { getRules(); init();}
-    minimizeBTN.onclick=function() {
+    bind('oneframeBTN', 'onclick', 0, function(){
+        update();
+    });
+
+    bind('resetBTN', 'onclick', 0, function(){
+        getRules(); init();
+    });
+
+    bind('minimizeBTN', 'onclick', 0, function(){
         minimizeBTN_state ? minimizeBTN_state = 0 : minimizeBTN_state = 1;
         minimizeBTN_state ? hideElem('none') : hideElem('block');
         function hideElem(style){
-            document.getElementById('ui2').style.display = style;
+            getElement('ui2').style.display = style;
         }
-    }
+    });
 
-    //get input sliders
-    var mindDistSLDR = document.getElementById('mindDistSLDR'),
-        startingParticleCountSLDR = document.getElementById('startingParticleCountSLDR'),
-        maxVelocitySLDR = document.getElementById('maxVelocitySLDR'),
-        expandDividerSLDR = document.getElementById('expandDividerSLDR');
+    bind('pauseBTN', 'onclick', 0, function(){
+        gameRunning = false;
+    });
 
-    mindDistSLDR.value = minDist;
-    startingParticleCountSLDR.value = startingParticleCount;
-    maxVelocitySLDR.value = maxVelocity;
-    expandDividerSLDR.value = expandDivider;
+    bind('resumeBTN', 'onclick', 0, function(){
+        gameRunning = true;
+    });
 
-    mindDistSLDR.onchange=function() {minDist = this.value}
-    startingParticleCountSLDR.onchange = function() {startingParticleCount = this.value}
-    maxVelocitySLDR.onchange = function() {maxVelocity = this.value}
-    expandDividerSLDR.onchange = function() {expandDivider = this.value}
+    bind('mindDistSLDR', 'onchange', minDist, function(elem){
+        minDist = elem.value;
+    });
+
+    bind('startingParticleCountSLDR', 'onchange', startingParticleCount, function(elem){
+        startingParticleCount = elem.value;
+    });
+
+    bind('maxVelocitySLDR', 'onchange', maxVelocity, function(elem){
+        maxVelocity = elem.value;
+    });
+
+    bind('expandDividerSLDR', 'onchange', expandDivider, function(elem){
+        expandDivider = elem.value;
+    });
 
     //get input checkboxes
-    var showAgeCHK = document.getElementById('showAgeCHK');
+    var showAgeCHK = getElement('showAgeCHK');
     //TODO: this
 
     //get input text
-    var rulesINPT1 = document.getElementById('rulesINPT1'),
-        rulesINPT2 = document.getElementById('rulesINPT2'),
-        rulesINPT22 = document.getElementById('rulesINPT22'),
-        rulesINPT3 = document.getElementById('rulesINPT3');
+    var rulesINPT1 = getElement('rulesINPT1'),
+        rulesINPT2 = getElement('rulesINPT2'),
+        rulesINPT22 = getElement('rulesINPT22'),
+        rulesINPT3 = getElement('rulesINPT3');
 
     rulesINPT1.value = rule1;
     rulesINPT2.value = rule2;
@@ -296,8 +314,9 @@ window.onload = function(){
         rule22 = parseInt(rulesINPT22.value);
         rule3 = parseInt(rulesINPT3.value);
     }
+
     //get ui container
-    var ui = document.getElementById('ui');
+    var ui = getElement('ui');
 
     ui.onmousedown = function(e) {
         ui.onmousemove = function(e) {
