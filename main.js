@@ -1,28 +1,26 @@
-window.requestAnimFrame = (function(){
-  return window.requestAnimationFrame       ||
-         window.webkitRequestAnimationFrame ||
-         window.mozRequestAnimationFrame    ||
-         window.oRequestAnimationFrame      ||
-         window.msRequestAnimationFrame     ||
-         function( callback ){
-           window.setTimeout(callback, 1000/30);
-         };
-})();
+var canvas, ctx, H, W;
 
-var canvas = document.getElementById("game"),
-	ctx = canvas.getContext("2d"),
-	W = window.innerWidth - 5, 
-	H = window.innerHeight - 5;
+Canvas = {
 
-canvas.width = W;
-canvas.height = H;
+    init : function(){
+        canvas = document.getElementById('game');
+        ctx = canvas.getContext('2d');
+    },
+
+    setSize : function(){
+        W = window.innerWidth - 5;
+        H = window.innerHeight - 5;
+        canvas.width = W;
+        canvas.height = H;
+    }
+}
 
 //settings
 var startingParticleCount = 500,
     minDist = 50,
     expandDivider = 2,
-    gameState = 1,
     maxVelocity = 2,
+    gameRunning = true,
     showAge = 1;
 
 //rules //TODO: fix
@@ -64,14 +62,14 @@ function constructParticle(posX, posY, vx, vy) {
 }
 
 //Particle
-function Particle(posX, posY, vvx, vvy) {
+var Particle = function(posX, posY, vvx, vvy) {
 
     this.self = this;
     this.x = posX;
     this.y = posY;
     this.vx = vvx;
     this.vy = vvy;
-    this.neighbors = null;
+    this.neighbors = -1;
     this.age = 0;
 }
 
@@ -104,7 +102,7 @@ Particle.prototype.update = function(){
     //find neighbors
     var i = particles.length;
     while(i--){
-        p2 = particles[i]
+        var p2 = particles[i];
         if(p2 === this.self) break;
         getVector(this.self, p2);
     }
@@ -131,39 +129,7 @@ Particle.prototype.draw = function(){
     ctx.closePath();
 }
 
-function update() {
-
-    //check rules
-    rules();
-
-    //clear canvas
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0,0,W,H);
-
-    //itterate Particle instances
-    var i = particles.length;
-    while(i--){
-        particles[i].update();
-        if(showAge === 1)particles[i].draw();
-    }
-}
-
-//checks game rules
-function rules(){
-
-    //iterrate Particle instances
-    var i = particles.length;
-    while(i--){
-        var p1 = particles[i];
-        if( p1.neighbors === rule1 ) p1.kill();
-        if( p1.neighbors > rule3 ) p1.kill();
-        if( p1.neighbors === rule2 || p1.neighbors === rule22) constructParticle(
-            p1.x + rand(minDist/expandDivider), p1.y + rand(minDist/expandDivider), p1.vx, p1.vy
-        );
-    }
-}
-
-//calculates and draws vector
+//calculate and draw vector
 function getVector(p1, p2) {
 
     //get distance between p1 and p2
@@ -186,11 +152,42 @@ function getVector(p1, p2) {
     }
 }
 
+//checks game rules
+function rules(){
+
+    //iterrate Particle instances
+    var i = particles.length;
+    while(i--){
+        var p1 = particles[i];
+        if( p1.neighbors === rule1 ) p1.kill();
+        if( p1.neighbors > rule3 ) p1.kill();
+        if( p1.neighbors === rule2 || p1.neighbors === rule22) constructParticle(
+            p1.x + rand(minDist/expandDivider), p1.y + rand(minDist/expandDivider), p1.vx, p1.vy
+        );
+    }
+}
+
+function update() {
+
+    //check rules
+    rules();
+
+    //clear canvas
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0,0,W,H);
+
+    //itterate Particle instances
+    var i = particles.length;
+    while(i--){
+        particles[i].update();
+        if(showAge === 1)particles[i].draw();
+    }
+}
+
 //game loop
 function loop() {
 
-    if(gameState === 1){
-        linesCounter = 0;
+    if(gameRunning === true){
         update();
     }
 
@@ -199,6 +196,9 @@ function loop() {
 
 //initiate new simulation
 function init(){
+
+    Canvas.init();
+    Canvas.setSize();
 
     //clear Particle instance array
     particles = [];
@@ -209,6 +209,17 @@ function init(){
 		constructParticle();
 	}
 }
+
+window.requestAnimFrame = (function(){
+  return window.requestAnimationFrame       ||
+         window.webkitRequestAnimationFrame ||
+         window.mozRequestAnimationFrame    ||
+         window.oRequestAnimationFrame      ||
+         window.msRequestAnimationFrame     ||
+         function( callback ){
+           window.setTimeout(callback, 1000/30);
+         };
+})();
 
 init();
 loop();
@@ -236,8 +247,8 @@ window.onload = function(){
     var helpBTN_state = 0,
         minimizeBTN_state = 0;
 
-    pauseBTN.onclick=function() {gameState = 0;}
-    resumeBTN.onclick=function() {gameState = 1}
+    pauseBTN.onclick=function() {gameRunning = false;}
+    resumeBTN.onclick=function() {gameRunning = true;}
     oneframeBTN.onclick=function() {update()}
     resetBTN.onclick=function() { getRules(); init();}
     minimizeBTN.onclick=function() {
@@ -248,7 +259,7 @@ window.onload = function(){
         }
     }
 
-    //get sliders
+    //get input sliders
     var mindDistSLDR = document.getElementById('mindDistSLDR'),
         startingParticleCountSLDR = document.getElementById('startingParticleCountSLDR'),
         maxVelocitySLDR = document.getElementById('maxVelocitySLDR'),
@@ -264,20 +275,11 @@ window.onload = function(){
     maxVelocitySLDR.onchange = function() {maxVelocity = this.value}
     expandDividerSLDR.onchange = function() {expandDivider = this.value}
 
-    //get checkboxes
+    //get input checkboxes
     var showAgeCHK = document.getElementById('showAgeCHK');
+    //TODO: this
 
-    //showAgeCHK.onchange = function() {
-    //    if(showAge === 1){
-    //        showAge = 0;
-    //        return;
-    //    }
-    //    showAge = 1;
-    //    console.log(this.checked);
-    //    console.log(this.value)
-    //}
-
-    //get text input
+    //get input text
     var rulesINPT1 = document.getElementById('rulesINPT1'),
         rulesINPT2 = document.getElementById('rulesINPT2'),
         rulesINPT22 = document.getElementById('rulesINPT22'),
