@@ -89,17 +89,11 @@ Particle.prototype.update = function(){
 	this.x += this.vx;
 	this.y += this.vy;
 
-    //test
-    if(this.x > W) this.x = 0;
-    if(this.x < 0) this.x = W;
-    if(this.y > H) this.y = 0;
-    if(this.y < 0) this.y = H;
-
-    ////bounce off edges
-	//if(this.x > W) this.vx = -Math.abs(this.vx);
-	//if(this.x < 5) this.vx = Math.abs(this.vx);
-	//if(this.y > H) this.vy = -Math.abs(this.vy);
-	//if(this.y < 5) this.vy = Math.abs(this.vy);
+    //bounce off edges
+	if(this.x > W) this.vx = -Math.abs(this.vx);
+	if(this.x < 5) this.vx = Math.abs(this.vx);
+	if(this.y > H) this.vy = -Math.abs(this.vy);
+	if(this.y < 5) this.vy = Math.abs(this.vy);
 
     //reset neighbor count
     this.neighbors = 0;
@@ -141,7 +135,7 @@ function getVector(p1, p2) {
     var dx = p1.x - p2.x,
         dy = p1.y - p2.y,
         dist = Math.sqrt(dx*dx + dy*dy);
-    if( Math.abs(dist-W) <= minDist && Math.abs(dist-H) <= minDist ) console.log('awd');
+
     if(dist <= minDist) {
 
         //update neighbor count
@@ -233,6 +227,8 @@ loop();
 *   DOM
 */
 
+//TODO: fix this... all of this V
+
 canvas.onmousedown = function(e) {
     canvas.onmousemove = function(e) { constructParticle(e.pageX, e.pageY); }
     document.onmouseup = function() { canvas.onmousemove = null; }
@@ -251,6 +247,7 @@ function bind(elem, listener, model, callback){
     }
 }
 
+//UI
 window.onload = function(){
 
     var helpBTN_state = 0,
