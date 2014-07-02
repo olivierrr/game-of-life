@@ -8,8 +8,8 @@ Canvas = {
     },
 
     setSize : function(){
-        W = window.innerWidth - 5;
-        H = window.innerHeight - 5;
+        W = window.innerWidth 5;
+        H = window.innerHeight 5;
         canvas.width = W;
         canvas.height = H;
     }
@@ -55,8 +55,15 @@ var rule3 = 6,
     rule1 = 0;
 
 // returns random number between -max and max
-function rand(max){
+function rand(max, maxmax){
+    o = rando(max);
+    while(o<0 || o>maxmax){
+        o = rando(max);
+    }
+    return rando(max);
+}
 
+function rando(max){
     return Math.random() * (max + max) - max;
 }
 
@@ -71,7 +78,7 @@ function getRandomNum(min, max) {
 */
 
 //holds Particle instances
-var particles; 
+var particles = []; 
 
 //Particle instance constructor
 function constructParticle(posX, posY, vx, vy) {
@@ -79,8 +86,8 @@ function constructParticle(posX, posY, vx, vy) {
     particles.push(new Particle(
         posX || getRandomNum(0,W),
         posY || getRandomNum(0,H),
-        vx   || rand(maxVelocity),
-        vy   || rand(maxVelocity)
+        vx   || rando(maxVelocity),
+        vy   || rando(maxVelocity)
     ));
 
     Stats.currentParticleCount +=1;
@@ -140,19 +147,19 @@ Particle.prototype.draw = function(){
     var color = '#ADFF2F';
     var size = 2;
 
-    //TODO: fix wall o' ifs
-    if(this.age>10) {color = '#008000';}
-    if(this.age>30) {color = '#00FA9A';}
-    if(this.age>50) {color = '#4682B4'; size = 3}
-    if(this.age>80) {color = '#4169E1'; size = 3}
-    if(this.age>150) {color = '#8A2BE2'; size = 4}
+    ////TODO: fix wall o' ifs
+    //if(this.age>10) {color = '#008000';}
+    //if(this.age>30) {color = '#00FA9A';}
+    //if(this.age>50) {color = '#4682B4'; size = 3}
+    //if(this.age>80) {color = '#4169E1'; size = 3}
+    //if(this.age>150) {color = '#8A2BE2'; size = 4}
 
-    //draw Particle
-    ctx.beginPath;
-    ctx.arc(this.x, this.y, size, 0, 2 * Math.PI, false);
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.closePath();
+    ////draw Particle
+    //ctx.beginPath;
+    //ctx.arc(this.x, this.y, size, 0, 2 * Math.PI, false);
+    //ctx.fillStyle = color;
+    //ctx.fill();
+    //ctx.closePath();
 }
 
 //calculate and draw vector
@@ -195,7 +202,7 @@ function checkRules(){
             Stats.deadByOvercrowding +=1;
         }
         if( p1.neighbors === rule2 || p1.neighbors === rule22) constructParticle(
-            p1.x + rand(minDist/expandDivider), p1.y + rand(minDist/expandDivider), p1.vx, p1.vy
+            p1.x + rand(minDist/expandDivider, W), p1.y + rand(minDist/expandDivider, H), p1.vx, p1.vy
         );
     }
 }
@@ -267,7 +274,7 @@ loop();
 */
 
 canvas.onmousedown = function(e) {
-    canvas.onmousemove = function(e) { constructParticle(e.pageX, e.pageY); }
+    canvas.onmousemove = function(e) { constructParticle(e.pageX, e.pageY);}
     document.onmouseup = function() { canvas.onmousemove = null; }
 }
 
