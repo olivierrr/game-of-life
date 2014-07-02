@@ -15,6 +15,31 @@ Canvas = {
     }
 }
 
+Stats = {
+
+    deadByOvercrowding : 0,
+    deadByIsolation : 0,
+    currentParticleCount : 0,
+
+    stats1 : document.getElementById('stats1'),
+    stats2 : document.getElementById('stats2'),
+    stats3 : document.getElementById('stats3'),
+
+    reset : function(){
+
+        this.deadByOvercrowding = 0;
+        this.deadByIsolation = 0;
+        this.currentParticleCount = 0;
+    },
+
+    update: function(){
+
+        this.stats1.textContent = this.deadByOvercrowding;
+        this.stats2.textContent = this.deadByIsolation;
+        this.stats3.textContent = this.currentParticleCount;
+    }
+}
+
 //settings
 var startingParticleCount = 500,
     minDist = 50,
@@ -29,15 +54,13 @@ var rule3 = 6,
     rule22 = 4,
     rule1 = 0;
 
-// returns a positive or negative between 0 and @param[max]
+// returns random number between -max and max
 function rand(max){
 
-    var num = getRandomNum(0, max);
-    if(Math.random() < 0.5) num = -Math.abs(num);
-    return num;
+    return Math.random() * (max + max) - max;
 }
 
-//returns a random number between @param[min] and @param[max]
+//returns random number between min and max
 function getRandomNum(min, max) {
 
     return Math.random() * (max - min) + min;
@@ -59,6 +82,8 @@ function constructParticle(posX, posY, vx, vy) {
         vx   || rand(maxVelocity),
         vy   || rand(maxVelocity)
     ));
+
+    Stats.currentParticleCount +=1;
 }
 
 //Particle
@@ -77,6 +102,8 @@ Particle.prototype.kill = function(){
 
 	index = particles.indexOf(this);
     particles.splice(index, 1);
+
+    Stats.currentParticleCount -= 1;
 }
 
 //update Particle instance
@@ -158,8 +185,15 @@ function checkRules(){
     var i = particles.length;
     while(i--){
         var p1 = particles[i];
-        if( p1.neighbors <= rule1 ) p1.kill();
-        if( p1.neighbors >= rule3 ) p1.kill();
+
+        if( p1.neighbors <= rule1 ) {
+            p1.kill();
+            Stats.deadByIsolation +=1;
+        }
+        if( p1.neighbors >= rule3 ) {
+            p1.kill();
+            Stats.deadByOvercrowding +=1;
+        }
         if( p1.neighbors === rule2 || p1.neighbors === rule22) constructParticle(
             p1.x + rand(minDist/expandDivider), p1.y + rand(minDist/expandDivider), p1.vx, p1.vy
         );
@@ -171,6 +205,9 @@ function update() {
     //clear canvas
     ctx.fillStyle = 'black';
     ctx.fillRect(0,0,W,H);
+
+    //stats update
+    Stats.update();
 
     //itterate Particle instances
     var i = particles.length;
@@ -198,6 +235,8 @@ function init(){
 
     Canvas.init();
     Canvas.setSize();
+
+    Stats.reset();
 
     //clear Particle instance array
     particles = [];
@@ -227,8 +266,6 @@ loop();
 *   DOM
 */
 
-//TODO: fix this... all of this V
-
 canvas.onmousedown = function(e) {
     canvas.onmousemove = function(e) { constructParticle(e.pageX, e.pageY); }
     document.onmouseup = function() { canvas.onmousemove = null; }
@@ -247,7 +284,6 @@ function bind(elem, listener, model, callback){
     }
 }
 
-//UI
 window.onload = function(){
 
     var helpBTN_state = 0,

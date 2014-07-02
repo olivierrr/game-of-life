@@ -41,20 +41,38 @@
                 <br>
                 <div class='small'>offspring spawn distance (lower = further)</div>
             </div>
+
             <br>
-            <div>RULES</div>
-			<div id='rules'>
-				<input type="text" id='rulesINPT1'> connections or less = death <br>
-				<input type="text" id='rulesINPT2'> connections = new adjacent Particle <br>
-				<input type="text" id='rulesINPT22'> connections = new adjacent Particle <br>
-				<input type="text" id='rulesINPT3'> connections or more = death <br>
-			</div><br>
+
+            <div>RULES
+                <div id='rules'>
+                	<input type="text" id='rulesINPT1'> connections or less = death <br>
+                	<input type="text" id='rulesINPT2'> connections = new adjacent Particle <br>
+                	<input type="text" id='rulesINPT22'> connections = new adjacent Particle <br>
+                	<input type="text" id='rulesINPT3'> connections or more = death <br>
+                </div>
+            </div>
+
+            <br>
 			<div class='small'>(reset to apply)</div>
+            <br>
+
+            <div>STATS
+                <div id='stats'>
+                    <div>dead from overcrowding <span id='stats1'>0</span></div>
+                    <div>dead from isolation <span id='stats2'>0</span></div>
+                    <div>particle count <span id='stats3'>0</span></div>
+                </div>
+                <br>
+            </div>
 
         </div>
     </div>
+
     <canvas id='game'></canvas>
+
     <script type="text/javascript" src="main.js"></script>
+    
 </body>
 
 </html>
