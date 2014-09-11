@@ -26,14 +26,12 @@ Stats = {
     stats3 : document.getElementById('stats3'),
 
     reset : function(){
-
         this.deadByOvercrowding = 0;
         this.deadByIsolation = 0;
         this.currentParticleCount = 0;
     },
 
     update: function(){
-
         this.stats1.textContent = this.deadByOvercrowding;
         this.stats2.textContent = this.deadByIsolation;
         this.stats3.textContent = this.currentParticleCount;
@@ -45,8 +43,7 @@ var startingParticleCount = 500,
     minDist = 50,
     expandDivider = 2,
     maxVelocity = 2,
-    gameRunning = true,
-    showAge = 1;
+    gameRunning = true;
 
 //rules //TODO: fix
 var rule3 = 6,
@@ -56,10 +53,6 @@ var rule3 = 6,
 
 // returns random number between -max and max
 function rand(max, maxmax){
-    o = rando(max);
-    while(o<0 || o>maxmax){
-        o = rando(max);
-    }
     return rando(max);
 }
 
@@ -78,7 +71,7 @@ function getRandomNum(min, max) {
 */
 
 //holds Particle instances
-var particles = []; 
+var particles = [];
 
 //Particle instance constructor
 function constructParticle(posX, posY, vx, vy) {
@@ -105,7 +98,7 @@ var Particle = function(posX, posY, vvx, vvy) {
 }
 
 //destroy Particle instance references
-Particle.prototype.kill = function(){
+Particle.prototype.kill = function() {
 
 	index = particles.indexOf(this);
     particles.splice(index, 1);
@@ -114,7 +107,7 @@ Particle.prototype.kill = function(){
 }
 
 //update Particle instance
-Particle.prototype.update = function(){
+Particle.prototype.update = function() {
 
     //update age
     this.age +=1;
@@ -142,24 +135,20 @@ Particle.prototype.update = function(){
 }
 
 //draw Particle instance
-Particle.prototype.draw = function(){
-
-    var color = '#ADFF2F';
-    var size = 2;
-
-    ////TODO: fix wall o' ifs
-    //if(this.age>10) {color = '#008000';}
-    //if(this.age>30) {color = '#00FA9A';}
-    //if(this.age>50) {color = '#4682B4'; size = 3}
-    //if(this.age>80) {color = '#4169E1'; size = 3}
-    //if(this.age>150) {color = '#8A2BE2'; size = 4}
-
-    ////draw Particle
-    //ctx.beginPath;
-    //ctx.arc(this.x, this.y, size, 0, 2 * Math.PI, false);
-    //ctx.fillStyle = color;
-    //ctx.fill();
-    //ctx.closePath();
+Particle.prototype.draw = function() {
+    if(this.age > 10) {
+        var color = '#008000', size = 2;
+        if(this.age>30) {color = '#00FA9A';}
+        if(this.age>50) {color = '#4682B4'; size = 3}
+        if(this.age>80) {color = '#4169E1'; size = 3}
+        if(this.age>150) {color = '#8A2BE2'; size = 4}
+        //draw Particle
+        ctx.beginPath;
+        ctx.arc(this.x, this.y, size, 0, 2 * Math.PI, false);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.closePath();
+    }
 }
 
 //calculate and draw vector
@@ -186,9 +175,7 @@ function getVector(p1, p2) {
 }
 
 //checks game rules
-function checkRules(){
-
-    //iterrate Particle instances
+function checkRules() {
     var i = particles.length;
     while(i--){
         var p1 = particles[i];
@@ -209,9 +196,7 @@ function checkRules(){
 
 function update() {
 
-    //clear canvas
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0,0,W,H);
+    ctx.clearRect(0,0,W,H);
 
     //stats update
     Stats.update();
@@ -220,25 +205,21 @@ function update() {
     var i = particles.length;
     while(i--){
         particles[i].update();
-        if(showAge === 1)particles[i].draw();
+        particles[i].draw();
     }
 
     //check rules
     checkRules();
 }
 
-//game loop
+// sim loop
 function loop() {
-
-    if(gameRunning === true){
-        update();
-    }
-
+    if(gameRunning === true) update();
     requestAnimFrame(loop);
 }
 
-//initiate new simulation
-function init(){
+// new sim
+function init() {
 
     Canvas.init();
     Canvas.setSize();
@@ -335,10 +316,6 @@ window.onload = function(){
     bind('expandDividerSLDR', 'onchange', expandDivider, function(elem){
         expandDivider = elem.value;
     });
-
-    //get input checkboxes
-    var showAgeCHK = getElement('showAgeCHK');
-    //TODO: this
 
     //get input text
     var rulesINPT1 = getElement('rulesINPT1'),
