@@ -8,8 +8,8 @@ Canvas = {
     },
 
     setSize : function(){
-        W = window.innerWidth 5;
-        H = window.innerHeight 5;
+        W = window.innerWidth;
+        H = window.innerHeight;
         canvas.width = W;
         canvas.height = H;
     }
