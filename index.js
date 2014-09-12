@@ -51,19 +51,14 @@ var rule3 = 6,
     rule22 = 4,
     rule1 = 0;
 
-// returns random number between -max and max
-function rand(max, maxmax){
-    return rando(max);
-}
-
-function rando(max){
-    return Math.random() * (max + max) - max;
+// returns random number between num and -num
+function rando(num){
+    return ((Math.random() * (num*2)) - num)
 }
 
 //returns random number between min and max
 function getRandomNum(min, max) {
-
-    return Math.random() * (max - min) + min;
+    return ((Math.random() * (max - min)) + min)
 }
 
 /*===================================================================
@@ -75,6 +70,23 @@ var particles = [];
 
 //Particle instance constructor
 function constructParticle(posX, posY, vx, vy) {
+
+    var i = particles.length;
+    while(i--) {
+        if(particles[i].isActive === false) {
+            var p = particles[i]
+
+            p.vx = vx || rando(maxVelocity)
+            p.vy = vy || rando(maxVelocity)
+            p.x = posX || getRandomNum(0,W)
+            p.y = posY || getRandomNum(0,H)
+            p.neighbors = 0
+            p.age = 0
+            p.isActive = true
+            Stats.currentParticleCount +=1;
+            return;
+        }
+    }
 
     particles.push(new Particle(
         posX || getRandomNum(0,W),
@@ -89,6 +101,7 @@ function constructParticle(posX, posY, vx, vy) {
 //Particle
 var Particle = function(posX, posY, vvx, vvy) {
 
+    this.isActive = true;
     this.x = posX;
     this.y = posY;
     this.vx = vvx;
@@ -100,9 +113,7 @@ var Particle = function(posX, posY, vvx, vvy) {
 //destroy Particle instance references
 Particle.prototype.kill = function() {
 
-	index = particles.indexOf(this);
-    particles.splice(index, 1);
-
+    this.isActive = false;
     Stats.currentParticleCount -= 1;
 }
 
@@ -189,7 +200,7 @@ function checkRules() {
             Stats.deadByOvercrowding +=1;
         }
         if( p1.neighbors === rule2 || p1.neighbors === rule22) constructParticle(
-            p1.x + rand(minDist/expandDivider, W), p1.y + rand(minDist/expandDivider, H), p1.vx, p1.vy
+            p1.x + rando(minDist/expandDivider, W), p1.y + rando(minDist/expandDivider, H), p1.vx, p1.vy
         );
     }
 }
@@ -204,8 +215,10 @@ function update() {
     //itterate Particle instances
     var i = particles.length;
     while(i--){
-        particles[i].update();
-        particles[i].draw();
+        if(particles[i].isActive === true) {
+            particles[i].update();
+            particles[i].draw();
+        }
     }
 
     //check rules
