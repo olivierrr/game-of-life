@@ -67,33 +67,31 @@ function getRandomNum(min, max) {
 
 //holds Particle instances
 var particles = [];
+var inactivePool = [];
 
 //Particle instance constructor
 function constructParticle(posX, posY, vx, vy) {
 
-    var i = particles.length;
-    while(i--) {
-        if(particles[i].isActive === false) {
-            var p = particles[i]
-
-            p.vx = vx || rando(maxVelocity)
-            p.vy = vy || rando(maxVelocity)
-            p.x = posX || getRandomNum(0,W)
-            p.y = posY || getRandomNum(0,H)
-            p.neighbors = 0
-            p.age = 0
-            p.isActive = true
-            Stats.currentParticleCount +=1;
-            return;
-        }
+    if(inactivePool.length>0) {
+        p = inactivePool.pop()
+        p.vx = vx || rando(maxVelocity);
+        p.vy = vy || rando(maxVelocity);
+        p.x = posX || getRandomNum(0,W);
+        p.y = posY || getRandomNum(0,H);
+        p.neighbors = 0;
+        p.age = 0;
+        p.isActive = true;
+        p.id = Math.random();
     }
 
-    particles.push(new Particle(
-        posX || getRandomNum(0,W),
-        posY || getRandomNum(0,H),
-        vx   || rando(maxVelocity),
-        vy   || rando(maxVelocity)
-    ));
+    else {
+        particles.push(new Particle(
+            posX || getRandomNum(0,W),
+            posY || getRandomNum(0,H),
+            vx   || rando(maxVelocity),
+            vy   || rando(maxVelocity)
+        )); 
+    }
 
     Stats.currentParticleCount +=1;
 }
@@ -108,12 +106,13 @@ var Particle = function(posX, posY, vvx, vvy) {
     this.vy = vvy;
     this.neighbors = 0;
     this.age = 0;
+    this.id = Math.random();
 }
 
 //destroy Particle instance references
 Particle.prototype.kill = function() {
-
     this.isActive = false;
+    inactivePool.push(this);
     Stats.currentParticleCount -= 1;
 }
 
@@ -140,7 +139,8 @@ Particle.prototype.update = function() {
     var i = particles.length;
     while(i--){
         var p2 = particles[i];
-        if(p2 === this) break;
+        if(p2.isActive === false) continue;
+        if(p2.id === this.id) break;
         getVector(this, p2);
     }
 }
@@ -190,6 +190,7 @@ function checkRules() {
     var i = particles.length;
     while(i--){
         var p1 = particles[i];
+        if(p1.isActive === false) continue
 
         if( p1.neighbors <= rule1 ) {
             p1.kill();
